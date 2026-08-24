@@ -1,0 +1,13 @@
+{% extends 'users/base.html' %}
+
+{% block title %}
+  Homepage
+{% endblock %}
+
+{% block content %}
+  <a href="{% url 'home' %}">Home</a> {# Named path lookup #}
+  <br>
+  <a href="{% url 'register' %}">Register</a>
+  <br>
+  <a href="{% url 'login' %}">Login</a>
+{% endblock %}
