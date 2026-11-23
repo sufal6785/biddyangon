@@ -5,8 +5,6 @@ import sys
 # Base Directory Setup
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Add 'apps' folder to Python module lookup path
-sys.path.insert(0, os.path.join(BASE_DIR, "apps"))
 
 
 # Security & Environment Settings
@@ -17,7 +15,7 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,*").split(",")
 
 
 # Installed Applications
@@ -34,10 +32,17 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "corsheaders",
     # Biddyangon Domain Apps
+    "apps.core",
     "apps.users",
+    "apps.people",
+    "apps.academics",
     "apps.enrollments",
     "apps.finance",
-    "apps.academics",
+    "apps.attendance",
+    "apps.results",
+    "apps.exams",
+    "apps.complaints",
+    "apps.dashboard",
 ]
 
 
@@ -73,18 +78,29 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-# PostgreSQL Database Configuration
-# Requires: pip install psycopg2-binary
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME", "biddyangon_db"),
-        "USER": os.environ.get("DB_USER", "postgres"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", "sufal6785"),
-        "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
+# Database Configuration:
+# Defaults to SQLite for local development and test stability without requiring an external service.
+# Set DB_ENGINE=django.db.backends.postgresql to use PostgreSQL.
+DB_ENGINE = os.environ.get("DB_ENGINE", "django.db.backends.sqlite3")
+
+if "sqlite3" in DB_ENGINE or os.environ.get("USE_SQLITE", "True").lower() == "true":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": os.environ.get("DB_NAME", "biddyangon_db"),
+            "USER": os.environ.get("DB_USER", "postgres"),
+            "PASSWORD": os.environ.get("DB_PASSWORD", "sufal6785"),
+            "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
+            "PORT": os.environ.get("DB_PORT", "5432"),
+        }
+    }
 
 
 # Custom User Model
@@ -120,7 +136,7 @@ USE_TZ = True
 
 # Static & Media Asset Settings
 STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "media/"
@@ -131,6 +147,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Local Console Email Driver (Dev Only)
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+# Auth Redirects
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "dashboard"
+LOGOUT_REDIRECT_URL = "login"
 
 
 # Django REST Framework Settings
