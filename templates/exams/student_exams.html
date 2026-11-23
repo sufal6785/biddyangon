@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Online Exams Portal - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-pencil-square text-primary me-2"></i>Online Assessment Portal</h2>
+    <p class="text-muted mb-0">Active assessments. Note: Course fee must be fully paid (0 due) to sit for online exams.</p>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  {% for card in exam_cards %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm rounded-4 bg-white h-100">
+        <div class="card-body p-4 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="fw-bold mb-0 text-dark">{{ card.exam.title }}</h5>
+            <span class="badge bg-secondary">{{ card.exam.duration_minutes }} mins</span>
+          </div>
+          <small class="text-muted d-block mb-3">{{ card.exam.course.name }} &bull; Date: {{ card.exam.date }}</small>
+
+          <div class="bg-light p-3 rounded-3 mb-3">
+            <div class="d-flex justify-content-between small mb-1">
+              <span class="text-muted">Total Marks:</span>
+              <strong>{{ card.exam.total_marks }}</strong>
+            </div>
+            <div class="d-flex justify-content-between small">
+              <span class="text-muted">Fee Gate Status:</span>
+              {% if card.is_fee_cleared %}
+                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Fee Cleared</span>
+              {% else %}
+                <span class="badge bg-danger"><i class="bi bi-lock-fill me-1"></i>Due Pending (৳{{ card.enrollment.due_amount }})</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="mt-auto">
+            {% if card.attempt and card.attempt.is_completed %}
+              <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                <span class="text-muted small">Score: <strong>{{ card.attempt.score }}</strong> / {{ card.exam.total_marks }}</span>
+                <a href="{% url 'exams:attempt_result' card.attempt.pk %}" class="btn btn-sm btn-outline-primary">Review Answers</a>
+              </div>
+            {% elif card.can_start %}
+              <a href="{% url 'exams:take_exam' card.exam.pk %}" class="btn btn-primary w-100 py-2 fw-semibold">
+                <i class="bi bi-play-circle me-1"></i>Start Assessment
+              </a>
+            {% else %}
+              <button disabled class="btn btn-secondary w-100 py-2">
+                <i class="bi bi-lock me-1"></i>Locked (Fees Due)
+              </button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12 text-center text-muted py-5">
+      No assessments scheduled for your enrolled courses.
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
