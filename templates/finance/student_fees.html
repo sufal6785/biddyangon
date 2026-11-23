@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}My Tuition Fees - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-receipt text-primary me-2"></i>My Tuition Fees & Payments</h2>
+    <p class="text-muted mb-0">Track your course tuition due balance, payment receipts, and settlement history.</p>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <div class="text-muted small text-uppercase fw-semibold mb-1">Total Agreed Fees</div>
+      <h3 class="fw-bold mb-0 text-dark">৳ {{ total_fee|floatformat:2 }}</h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <div class="text-muted small text-uppercase fw-semibold mb-1">Total Paid To Date</div>
+      <h3 class="fw-bold mb-0 text-success">৳ {{ total_paid|floatformat:2 }}</h3>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <div class="text-muted small text-uppercase fw-semibold mb-1">Outstanding Due</div>
+      <h3 class="fw-bold mb-0 {% if total_due > 0 %}text-danger{% else %}text-success{% endif %}">
+        ৳ {{ total_due|floatformat:2 }}
+      </h3>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3 bg-white mb-4">
+  <div class="card-header bg-white border-0 pt-3 pb-2">
+    <h5 class="fw-bold mb-0">Course Fee Breakdown</h5>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Course</th>
+            <th>Class</th>
+            <th>Agreed Total Fee</th>
+            <th>Paid</th>
+            <th>Remaining Due</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in enrollments %}
+            <tr>
+              <td>
+                <div class="fw-bold">{{ e.course.name }}</div>
+                <small class="text-muted">{{ e.course.code }}</small>
+              </td>
+              <td>{{ e.course.academic_class.name }}</td>
+              <td>৳ {{ e.fee_total|floatformat:2 }}</td>
+              <td class="text-success fw-bold">৳ {{ e.total_paid|floatformat:2 }}</td>
+              <td class="{% if e.due_amount > 0 %}text-danger{% else %}text-muted{% endif %} fw-bold">
+                ৳ {{ e.due_amount|floatformat:2 }}
+              </td>
+              <td>
+                {% if e.is_cleared %}
+                  <span class="badge bg-success">Cleared</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">Due Pending</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-3">No active course enrollments found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3 bg-white">
+  <div class="card-header bg-white border-0 pt-3 pb-2">
+    <h5 class="fw-bold mb-0">Payment Receipts History</h5>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Receipt #</th>
+            <th>Course</th>
+            <th>Amount Paid</th>
+            <th>Payment Method</th>
+            <th>Date Paid</th>
+            <th class="text-end">Print Receipt</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in payments %}
+            <tr>
+              <td><code>{{ p.receipt_no }}</code></td>
+              <td>{{ p.enrollment.course.name }}</td>
+              <td class="fw-bold text-success">৳ {{ p.amount|floatformat:2 }}</td>
+              <td><span class="badge bg-light text-dark border">{{ p.get_method_display }}</span></td>
+              <td>{{ p.paid_on }}</td>
+              <td class="text-end">
+                <a href="{% url 'finance:receipt' p.pk %}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-printer me-1"></i>View
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-3">No payments recorded yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Receipt {{ payment.receipt_no }} - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-7">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-5 print-container">
+      <!-- Receipt Header -->
+      <div class="d-flex justify-content-between align-items-center border-bottom pb-4 mb-4">
+        <div>
+          <h3 class="fw-bold text-primary mb-1"><i class="bi bi-mortarboard-fill me-2"></i>Biddyangon</h3>
+          <p class="text-muted small mb-0">Official Fee Payment Receipt</p>
+        </div>
+        <div class="text-end">
+          <span class="badge bg-success fs-6 mb-1">PAID</span>
+          <div class="text-muted small">Date: {{ payment.paid_on }}</div>
+        </div>
+      </div>
+
+      <!-- Receipt Meta -->
+      <div class="row g-3 mb-4">
+        <div class="col-6">
+          <span class="text-muted small d-block">Receipt Number:</span>
+          <strong class="text-dark"><code>{{ payment.receipt_no }}</code></strong>
+        </div>
+        <div class="col-6 text-end">
+          <span class="text-muted small d-block">Payment Method:</span>
+          <strong>{{ payment.get_method_display }}</strong>
+        </div>
+        <div class="col-6">
+          <span class="text-muted small d-block">Student Name:</span>
+          <strong class="text-dark">{{ payment.enrollment.student.get_full_name|default:payment.enrollment.student.username }}</strong>
+          <small class="text-muted d-block">ID: {{ payment.enrollment.student.username }}</small>
+        </div>
+        <div class="col-6 text-end">
+          <span class="text-muted small d-block">Section:</span>
+          <strong>{{ payment.enrollment.student.student_profile.section|default:"General" }}</strong>
+        </div>
+      </div>
+
+      <!-- Financial Table -->
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>Description</th>
+              <th class="text-end">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="fw-bold">{{ payment.enrollment.course.name }}</div>
+                <small class="text-muted">Course Code: {{ payment.enrollment.course.code }} &bull; Total Fee: ৳{{ payment.enrollment.fee_total }}</small>
+              </td>
+              <td class="text-end fw-bold">৳ {{ payment.amount|floatformat:2 }}</td>
+            </tr>
+            <tr class="table-light">
+              <td class="fw-bold">Total Amount Paid This Receipt</td>
+              <td class="text-end fw-bold text-success fs-5">৳ {{ payment.amount|floatformat:2 }}</td>
+            </tr>
+            <tr>
+              <td class="text-muted">Remaining Balance Due for this Course</td>
+              <td class="text-end fw-semibold text-danger">৳ {{ payment.enrollment.due_amount|floatformat:2 }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      {% if payment.remarks %}
+        <div class="mb-4 text-muted small">
+          <strong>Remarks:</strong> {{ payment.remarks }}
+        </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-between align-items-center pt-4 border-top mt-auto text-muted small">
+        <span>Authorized By: {{ payment.received_by.get_full_name|default:payment.received_by.username }}</span>
+        <span>Generated: {{ payment.created_at|date:"d M Y H:i" }}</span>
+      </div>
+
+      <div class="mt-4 text-center d-print-none">
+        <button onclick="window.print();" class="btn btn-outline-primary me-2">
+          <i class="bi bi-printer me-1"></i>Print Receipt
+        </button>
+        <a href="{% url 'finance:payment_list' %}" class="btn btn-outline-secondary">
+          Back
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
