@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Complaints Management - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-chat-left-dots text-danger me-2"></i>Student Grievances & Feedback</h2>
+    <p class="text-muted mb-0">Track student issues, respond with official resolutions, and manage statuses.</p>
+  </div>
+  <div class="col-auto">
+    <form method="get" class="d-inline-flex gap-2">
+      <select name="status" class="form-select form-select-sm" onchange="this.form.submit();">
+        <option value="">All Statuses</option>
+        {% for s_val, s_label in status_choices %}
+          <option value="{{ s_val }}" {% if selected_status == s_val %}selected{% endif %}>{{ s_label }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3 bg-white mb-4">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Subject</th>
+            <th>Student</th>
+            <th>Date Submitted</th>
+            <th>Current Status</th>
+            <th>Resolved By</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in complaints %}
+            <tr>
+              <td>
+                <div class="fw-bold text-dark">{{ c.subject }}</div>
+                <small class="text-muted">{{ c.body|truncatewords:10 }}</small>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ c.student.get_full_name|default:c.student.username }}</div>
+                <small class="text-muted"><code>{{ c.student.username }}</code></small>
+              </td>
+              <td class="text-muted small">{{ c.created_at|date:"d M Y H:i" }}</td>
+              <td>
+                <span class="badge {% if c.status == 'OPEN' %}bg-warning text-dark{% elif c.status == 'IN_PROGRESS' %}bg-info{% else %}bg-success{% endif %}">
+                  {{ c.get_status_display }}
+                </span>
+              </td>
+              <td>{{ c.resolved_by.username|default:"Unassigned" }}</td>
+              <td class="text-end">
+                <a href="{% url 'complaints:complaint_detail' c.pk %}" class="btn btn-sm btn-outline-primary">Respond</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">No student grievances recorded.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Dashboard - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-mortarboard text-warning me-2"></i>Welcome, {{ teacher.get_full_name|default:teacher.username }}</h2>
+    <p class="text-muted mb-0">Teacher Portal: manage your assigned classes, attendance, exams, and payroll.</p>
+  </div>
+  <div class="col-auto">
+    <a href="{% url 'attendance:mark_attendance' %}" class="btn btn-primary">
+      <i class="bi bi-check2-square me-1"></i>Take Attendance
+    </a>
+  </div>
+</div>
+
+<!-- Teacher Metrics -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-3 bg-white">
+      <div class="card-body">
+        <div class="text-muted small text-uppercase fw-semibold mb-1">Assigned Courses</div>
+        <h3 class="fw-bold mb-0 text-primary">{{ assigned_courses.count }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-3 bg-white">
+      <div class="card-body">
+        <div class="text-muted small text-uppercase fw-semibold mb-1">Sessions Held (Month)</div>
+        <h3 class="fw-bold mb-0 text-success">{{ sessions_held_month }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-3 bg-white">
+      <div class="card-body">
+        <div class="text-muted small text-uppercase fw-semibold mb-1">Earned Salary (Month)</div>
+        <h3 class="fw-bold mb-0 text-dark">৳ {{ monthly_salary|floatformat:2 }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0 shadow-sm rounded-3 bg-white">
+      <div class="card-body">
+        <div class="text-muted small text-uppercase fw-semibold mb-1">Pending Result Submissions</div>
+        <h3 class="fw-bold mb-0 text-warning">{{ pending_results }}</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Today's Routine & Upcoming Exams -->
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card border-0 shadow-sm rounded-3 h-100">
+      <div class="card-header bg-white border-0 pt-3 pb-2 d-flex justify-content-between align-items-center">
+        <h5 class="fw-bold mb-0"><i class="bi bi-calendar-event text-primary me-2"></i>Today's Class Schedule</h5>
+        <a href="{% url 'academics:routine_list' %}" class="btn btn-sm btn-outline-secondary">Full Routine</a>
+      </div>
+      <div class="card-body">
+        {% if today_routine %}
+          <div class="list-group list-group-flush">
+            {% for slot in today_routine %}
+              <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                <div>
+                  <h6 class="fw-bold mb-1">{{ slot.course.name }} ({{ slot.section.name }})</h6>
+                  <span class="text-muted small"><i class="bi bi-geo-alt me-1"></i>{{ slot.room|default:"Standard Classroom" }}</span>
+                </div>
+                <div class="text-end">
+                  <span class="badge bg-primary fs-6">{{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}</span>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center text-muted py-4">
+            <i class="bi bi-cup-hot fs-1 text-secondary d-block mb-2"></i>
+            No classes scheduled for today. Have a productive preparation day!
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card border-0 shadow-sm rounded-3 h-100">
+      <div class="card-header bg-white border-0 pt-3 pb-2">
+        <h5 class="fw-bold mb-0"><i class="bi bi-journal-text text-danger me-2"></i>Upcoming Exams</h5>
+      </div>
+      <div class="card-body">
+        {% if upcoming_exams %}
+          <div class="list-group list-group-flush">
+            {% for exam in upcoming_exams %}
+              <div class="list-group-item px-0">
+                <div class="d-flex justify-content-between">
+                  <h6 class="fw-semibold mb-1">{{ exam.title }}</h6>
+                  <span class="badge bg-info text-dark">{{ exam.date }}</span>
+                </div>
+                <small class="text-muted">{{ exam.course.name }} &bull; Total Marks: {{ exam.total_marks }}</small>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center text-muted py-4">
+            <i class="bi bi-clipboard-x fs-1 d-block mb-2"></i>
+            No upcoming exams scheduled.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Complaint #{{ complaint.id }} - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <div class="mb-4">
+        <a href="{% url 'complaints:complaint_list' %}" class="small text-muted text-decoration-none">
+          <i class="bi bi-arrow-left me-1"></i>Back to Complaints
+        </a>
+        <h3 class="fw-bold mt-2 mb-1"><i class="bi bi-chat-left-dots text-danger me-2"></i>Respond to Grievance</h3>
+        <p class="text-muted small">Submitted by <strong>{{ complaint.student.get_full_name|default:complaint.student.username }}</strong> on {{ complaint.created_at|date:"d M Y H:i" }}</p>
+      </div>
+
+      <div class="bg-light p-3 rounded-3 mb-4">
+        <h5 class="fw-bold text-dark mb-2">{{ complaint.subject }}</h5>
+        <p class="mb-0 text-secondary" style="white-space: pre-wrap;">{{ complaint.body }}</p>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Status</label>
+          {{ form.status }}
+        </div>
+        <div class="mb-4">
+          <label class="form-label small fw-semibold">Official Admin Response to Student</label>
+          {{ form.admin_response }}
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 border-top pt-3">
+          <a href="{% url 'complaints:complaint_list' %}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary px-4">Update Resolution</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
