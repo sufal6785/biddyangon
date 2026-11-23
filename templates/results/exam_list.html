@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Exams Schedule - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-calendar-check text-primary me-2"></i>Examinations Schedule</h2>
+    <p class="text-muted mb-0">Scheduled academic assessments and linked syllabus topics.</p>
+  </div>
+  <div class="col-auto">
+    <a href="{% url 'results:exam_create' %}" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i>Schedule Exam
+    </a>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3 bg-white mb-4">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Exam Title</th>
+            <th>Course</th>
+            <th>Date</th>
+            <th>Duration</th>
+            <th>Total Marks</th>
+            <th>Syllabus Topics Covered</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for exam in exams %}
+            <tr>
+              <td class="fw-bold text-dark">{{ exam.title }}</td>
+              <td>{{ exam.course.name }}</td>
+              <td>{{ exam.date }}</td>
+              <td>{{ exam.duration_minutes }} mins</td>
+              <td class="fw-semibold">{{ exam.total_marks }}</td>
+              <td>
+                {% for topic in exam.syllabus_topics.all %}
+                  <span class="badge bg-light text-dark border me-1">{{ topic.title }}</span>
+                {% empty %}
+                  <span class="text-muted small">All topics</span>
+                {% endfor %}
+              </td>
+              <td>
+                <span class="badge {% if exam.status == 'OPEN' %}bg-success{% elif exam.status == 'SCHEDULED' %}bg-primary{% else %}bg-secondary{% endif %}">
+                  {{ exam.get_status_display }}
+                </span>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="7" class="text-center text-muted py-4">No exams scheduled yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

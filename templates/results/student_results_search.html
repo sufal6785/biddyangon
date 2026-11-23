@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Student Results Lookup - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-search text-primary me-2"></i>Student Result Lookup</h2>
+    <p class="text-muted mb-0">Search any student by username or roll number to inspect their full academic performance.</p>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-4">
+  <form method="get" class="row g-2">
+    <div class="col-md-6">
+      <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Enter student username (e.g. ssc26-001) or roll #...">
+    </div>
+    <div class="col-auto">
+      <button type="submit" class="btn btn-primary px-4"><i class="bi bi-search me-1"></i>Search Records</button>
+    </div>
+  </form>
+</div>
+
+{% if student %}
+  <div class="card border-0 shadow-sm rounded-3 bg-white mb-4">
+    <div class="card-header bg-white border-0 pt-3 pb-2 d-flex justify-content-between align-items-center">
+      <div>
+        <h5 class="fw-bold mb-0">{{ student.get_full_name|default:student.username }}</h5>
+        <small class="text-muted">Username: <code>{{ student.username }}</code> &bull; Section: {{ student.student_profile.section }} &bull; Roll: {{ student.student_profile.roll_no }}</small>
+      </div>
+      <span class="badge bg-primary fs-6">{{ results.count }} Exams Taken</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Exam</th>
+              <th>Course</th>
+              <th>Score</th>
+              <th>Percentage</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in results %}
+              <tr>
+                <td class="fw-bold">{{ r.exam.title }}</td>
+                <td>{{ r.exam.course.name }}</td>
+                <td class="fw-bold text-primary">{{ r.marks_obtained }} / {{ r.exam.total_marks }}</td>
+                <td>
+                  {% widthratio r.marks_obtained r.exam.total_marks 100 %}%
+                </td>
+                <td>
+                  <span class="badge {% if r.status == 'APPROVED' %}bg-success{% elif r.status == 'PENDING' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                    {{ r.get_status_display }}
+                  </span>
+                </td>
+                <td>{{ r.exam.date }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="6" class="text-center text-muted py-4">No exam records for this student.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% elif query %}
+  <div class="alert alert-warning">No student record found matching '{{ query }}'.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Results Approvals - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-patch-check text-primary me-2"></i>Results Approval Queue</h2>
+    <p class="text-muted mb-0">Review pending examination marks submitted by teaching staff before publication.</p>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3 bg-white mb-4">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Student</th>
+            <th>Exam & Course</th>
+            <th>Marks Submitted</th>
+            <th>Instructor</th>
+            <th>Submitted On</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in pending_results %}
+            <tr>
+              <td>
+                <div class="fw-bold text-dark">{{ r.enrollment.student.get_full_name|default:r.enrollment.student.username }}</div>
+                <small class="text-muted"><code>{{ r.enrollment.student.username }}</code> &bull; Roll: {{ r.enrollment.student.student_profile.roll_no }}</small>
+              </td>
+              <td>
+                <div class="fw-semibold">{{ r.exam.title }}</div>
+                <small class="text-muted">{{ r.enrollment.course.name }}</small>
+              </td>
+              <td class="fw-bold text-primary fs-6">{{ r.marks_obtained }} / {{ r.exam.total_marks }}</td>
+              <td>{{ r.submitted_by.get_full_name|default:r.submitted_by.username }}</td>
+              <td class="text-muted small">{{ r.created_at|date:"d M Y H:i" }}</td>
+              <td class="text-end">
+                <form action="{% url 'results:approve_result' r.pk %}" method="post" class="d-inline">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-sm btn-success me-1">
+                    <i class="bi bi-check-lg me-1"></i>Approve
+                  </button>
+                </form>
+
+                <!-- Reject Modal Trigger -->
+                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#rejectModal{{ r.pk }}">
+                  Reject
+                </button>
+
+                <!-- Reject Modal -->
+                <div class="modal fade text-start" id="rejectModal{{ r.pk }}" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content border-0 shadow">
+                      <form action="{% url 'results:reject_result' r.pk %}" method="post">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                          <h5 class="modal-title fw-bold">Reject Result Entry</h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                          <p class="small text-muted mb-2">Provide a reason or guidance for the instructor to rectify:</p>
+                          <textarea name="reason" class="form-control" rows="3" placeholder="e.g. Marks exceed total allowed for Section B" required></textarea>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                          <button type="submit" class="btn btn-sm btn-danger">Confirm Rejection</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-5">
+              <i class="bi bi-check-circle-fill text-success fs-1 d-block mb-2"></i>
+              No pending exam results awaiting approval.
+            </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

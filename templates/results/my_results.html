@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}My Results - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-award-fill text-warning me-2"></i>My Official Examination Scores</h2>
+    <p class="text-muted mb-0">Published and approved examination results across all your enrolled courses.</p>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3 bg-white mb-4">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Assessment Title</th>
+            <th>Course</th>
+            <th>Date</th>
+            <th>Score Obtained</th>
+            <th>Total Marks</th>
+            <th>Percentage</th>
+            <th>Result Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in results %}
+            <tr>
+              <td class="fw-bold text-dark">{{ r.exam.title }}</td>
+              <td>{{ r.exam.course.name }}</td>
+              <td>{{ r.exam.date }}</td>
+              <td class="fw-bold text-success fs-6">{{ r.marks_obtained }}</td>
+              <td>{{ r.exam.total_marks }}</td>
+              <td>
+                <span class="badge bg-light text-dark border">
+                  {% widthratio r.marks_obtained r.exam.total_marks 100 %}%
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Approved</span>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="7" class="text-center text-muted py-5">
+              <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+              No published exam results available at this time.
+            </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
