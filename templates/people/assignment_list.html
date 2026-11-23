@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Assignments - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-person-lines-fill text-primary me-2"></i>Teacher Course Assignments</h2>
+    <p class="text-muted mb-0">Assign courses to teachers and set their remuneration rate per session.</p>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-3 bg-white">
+      <div class="card-header bg-white border-0 pt-3 pb-2">
+        <h5 class="fw-bold mb-0">Current Assignments ({{ assignments.count }})</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Teacher</th>
+                <th>Course</th>
+                <th>Rate / Session</th>
+                <th>Assigned Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in assignments %}
+                <tr>
+                  <td>
+                    <div class="fw-bold">{{ a.teacher.get_full_name|default:a.teacher.username }}</div>
+                    <small class="text-muted">{{ a.teacher.email|default:a.teacher.phone }}</small>
+                  </td>
+                  <td>
+                    <div class="fw-semibold">{{ a.course.name }}</div>
+                    <small class="text-muted">{{ a.course.code }} &bull; {{ a.course.academic_class.name }}</small>
+                  </td>
+                  <td class="fw-bold text-success">৳ {{ a.rate_per_session|floatformat:2 }}</td>
+                  <td class="text-muted small">{{ a.assigned_at|date:"d M Y" }}</td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-4">No teacher assignments recorded yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm rounded-3 bg-white">
+      <div class="card-header bg-white border-0 pt-3 pb-2">
+        <h5 class="fw-bold mb-0"><i class="bi bi-plus-circle text-primary me-2"></i>Assign Course</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Select Teacher</label>
+            {{ form.teacher }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Select Course</label>
+            {{ form.course }}
+          </div>
+          <div class="mb-4">
+            <label class="form-label small fw-semibold">Rate Per Session (BDT)</label>
+            {{ form.rate_per_session }}
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Assign Course</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

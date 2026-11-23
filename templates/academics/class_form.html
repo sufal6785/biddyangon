@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Class - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <div class="mb-3">
+        <a href="{% url 'academics:class_list' %}" class="small text-muted text-decoration-none">
+          <i class="bi bi-arrow-left me-1"></i>Back to Classes
+        </a>
+        <h3 class="fw-bold mt-2 mb-1">Edit Class</h3>
+        <p class="text-muted small">Update class code and active state</p>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Class Name</label>
+          {{ form.name }}
+        </div>
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Code</label>
+          {{ form.code }}
+        </div>
+        <div class="form-check mb-4">
+          {{ form.is_active }}
+          <label class="form-check-label small" for="id_is_active">Active</label>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

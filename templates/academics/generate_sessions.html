@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Course Sessions - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <div class="mb-4">
+        <a href="{% url 'academics:session_list' %}" class="small text-muted text-decoration-none">
+          <i class="bi bi-arrow-left me-1"></i>Back to Sessions
+        </a>
+        <h3 class="fw-bold mt-2 mb-1"><i class="bi bi-magic text-primary me-2"></i>Generate Sessions from Routine</h3>
+        <p class="text-muted small">Automatically populate CourseSession rows matching the timetable routine over a selected date window.</p>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label small fw-semibold">Target Course</label>
+          {{ form.course }}
+        </div>
+        <div class="row g-2 mb-4">
+          <div class="col-6">
+            <label class="form-label small fw-semibold">Start Date</label>
+            {{ form.start_date }}
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-semibold">End Date</label>
+            {{ form.end_date }}
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 py-2">
+          <i class="bi bi-play-circle me-1"></i>Generate Sessions
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

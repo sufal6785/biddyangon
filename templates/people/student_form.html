@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Register Student - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <div class="mb-4">
+        <a href="{% url 'people:student_list' %}" class="small text-muted text-decoration-none">
+          <i class="bi bi-arrow-left me-1"></i>Back to Students
+        </a>
+        <h3 class="fw-bold mt-2 mb-1"><i class="bi bi-person-plus text-primary me-2"></i>Register New Student</h3>
+        <p class="text-muted small">Username is automatically generated according to standard: <code>{class_code}-{roll:03d}</code></p>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Class Section</label>
+            {{ form.section }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Section Roll Number</label>
+            {{ form.roll_no }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">First Name</label>
+            {{ form.first_name }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Last Name</label>
+            {{ form.last_name }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Email</label>
+            {{ form.email }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Phone</label>
+            {{ form.phone }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Guardian Name</label>
+            {{ form.guardian_name }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Guardian Phone</label>
+            {{ form.guardian_phone }}
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-semibold">Residential Location / Address</label>
+            {{ form.location }}
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-semibold">Initial Password</label>
+            {{ form.password }}
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+          <a href="{% url 'people:student_list' %}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary px-4">Register Student</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

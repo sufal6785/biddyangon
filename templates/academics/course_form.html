@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="card border-0 shadow-sm rounded-4 bg-white p-4">
+      <div class="mb-4">
+        <a href="{% url 'academics:course_list' %}" class="small text-muted text-decoration-none">
+          <i class="bi bi-arrow-left me-1"></i>Back to Courses
+        </a>
+        <h3 class="fw-bold mt-2 mb-1">{{ title }}</h3>
+        <p class="text-muted small">Configure course name, class, planned lectures, and tuition fee</p>
+      </div>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Academic Class</label>
+            {{ form.academic_class }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Course Code</label>
+            {{ form.code }}
+          </div>
+          <div class="col-12">
+            <label class="form-label small fw-semibold">Course Title</label>
+            {{ form.name }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Default Fee (BDT)</label>
+            {{ form.default_fee }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Total Planned Sessions</label>
+            {{ form.total_sessions_planned }}
+          </div>
+          <div class="col-12">
+            <div class="form-check">
+              {{ form.is_active }}
+              <label class="form-check-label small" for="id_is_active">Course is Active & Available for Enrollment</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+          <a href="{% url 'academics:course_list' %}" class="btn btn-outline-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary px-4">Save Course</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

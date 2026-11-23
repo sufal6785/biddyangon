@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Course Sessions - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-clock-history text-primary me-2"></i>Course Sessions</h2>
+    <p class="text-muted mb-0">Record of scheduled and completed course meetings.</p>
+  </div>
+  {% if user.role == 'ADMIN' or user.is_superuser %}
+    <div class="col-auto">
+      <a href="{% url 'academics:session_generate' %}" class="btn btn-primary">
+        <i class="bi bi-magic me-1"></i>Generate Sessions
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<div class="card border-0 shadow-sm rounded-3 bg-white mb-4">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Course</th>
+            <th>Section</th>
+            <th>Teacher</th>
+            <th>Topic</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for session in sessions %}
+            <tr>
+              <td class="fw-semibold text-dark">{{ session.date }}</td>
+              <td>{{ session.course.name }}</td>
+              <td>{{ session.section.name }}</td>
+              <td>{{ session.taught_by.get_full_name|default:session.taught_by.username|default:"Unassigned" }}</td>
+              <td>{{ session.topic|default:"Standard Class Lecture" }}</td>
+              <td>
+                {% if session.held %}
+                  <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Held</span>
+                {% else %}
+                  <span class="badge bg-secondary">Scheduled</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">No sessions found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

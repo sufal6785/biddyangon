@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Classes & Sections - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-building text-primary me-2"></i>Academic Classes & Sections</h2>
+    <p class="text-muted mb-0">Organize batches, programs, and classroom sections.</p>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm rounded-3 bg-white">
+      <div class="card-header bg-white border-0 pt-3 pb-2">
+        <h5 class="fw-bold mb-0">Existing Classes ({{ classes.count }})</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Class Name</th>
+                <th>Identifier Code</th>
+                <th>Sections</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for cls in classes %}
+                <tr>
+                  <td class="fw-bold text-dark">{{ cls.name }}</td>
+                  <td><code>{{ cls.code }}</code></td>
+                  <td>
+                    {% for sec in cls.sections.all %}
+                      <span class="badge bg-light text-dark border me-1">{{ sec.name }}</span>
+                    {% empty %}
+                      <span class="text-muted small">No sections yet</span>
+                    {% endfor %}
+                  </td>
+                  <td>
+                    {% if cls.is_active %}
+                      <span class="badge bg-success">Active</span>
+                    {% else %}
+                      <span class="badge bg-secondary">Archived</span>
+                    {% endif %}
+                  </td>
+                  <td class="text-end">
+                    <a href="{% url 'academics:class_edit' cls.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    <form action="{% url 'academics:class_delete' cls.pk %}" method="post" class="d-inline" onsubmit="return confirm('Delete this class?');">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+              {% empty %}
+                <tr><td colspan="5" class="text-center text-muted py-4">No classes registered yet.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <!-- Create Class Card -->
+    <div class="card border-0 shadow-sm rounded-3 bg-white mb-4">
+      <div class="card-header bg-white border-0 pt-3 pb-2">
+        <h5 class="fw-bold mb-0"><i class="bi bi-plus-circle text-primary me-2"></i>Add New Class</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create_class">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Class Name</label>
+            {{ class_form.name }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Short Code</label>
+            {{ class_form.code }}
+          </div>
+          <div class="form-check mb-3">
+            {{ class_form.is_active }}
+            <label class="form-check-label small" for="id_is_active">Active Enrollment</label>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Create Class</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Create Section Card -->
+    <div class="card border-0 shadow-sm rounded-3 bg-white">
+      <div class="card-header bg-white border-0 pt-3 pb-2">
+        <h5 class="fw-bold mb-0"><i class="bi bi-diagram-3 text-success me-2"></i>Add New Section</h5>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create_section">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Academic Class</label>
+            {{ section_form.academic_class }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Section Name</label>
+            {{ section_form.name }}
+          </div>
+          <button type="submit" class="btn btn-success w-100">Add Section</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Weekly Timetable Routine - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-calendar3 text-primary me-2"></i>Weekly Timetable Schedule</h2>
+    <p class="text-muted mb-0">Live schedule of classes across days, sections, and classrooms.</p>
+  </div>
+  {% if is_admin %}
+    <div class="col-auto">
+      <a href="{% url 'academics:session_generate' %}" class="btn btn-outline-primary">
+        <i class="bi bi-magic me-1"></i>Generate Sessions from Routine
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+{% if is_admin and form %}
+  <div class="card border-0 shadow-sm rounded-3 bg-white mb-4">
+    <div class="card-header bg-white border-0 pt-3 pb-2">
+      <h5 class="fw-bold mb-0"><i class="bi bi-plus-circle text-primary me-2"></i>Add Timetable Routine Slot</h5>
+    </div>
+    <div class="card-body">
+      <form method="post" class="row g-3">
+        {% csrf_token %}
+        <div class="col-md-2">
+          <label class="form-label small fw-semibold">Day</label>
+          {{ form.weekday }}
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small fw-semibold">Section</label>
+          {{ form.section }}
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold">Course</label>
+          {{ form.course }}
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small fw-semibold">Teacher</label>
+          {{ form.teacher }}
+        </div>
+        <div class="col-md-1">
+          <label class="form-label small fw-semibold">Start</label>
+          {{ form.start_time }}
+        </div>
+        <div class="col-md-1">
+          <label class="form-label small fw-semibold">End</label>
+          {{ form.end_time }}
+        </div>
+        <div class="col-md-1">
+          <label class="form-label small fw-semibold">Room</label>
+          {{ form.room }}
+        </div>
+        <div class="col-12 text-end">
+          <button type="submit" class="btn btn-primary px-4"><i class="bi bi-save me-1"></i>Save Slot</button>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endif %}
+
+<!-- Days Routine View -->
+<div class="row g-4">
+  {% for day_idx, day_info in days.items %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card border-0 shadow-sm rounded-3 bg-white h-100">
+        <div class="card-header bg-dark text-white fw-bold py-2 d-flex justify-content-between align-items-center">
+          <span>{{ day_info.name }}</span>
+          <span class="badge bg-secondary">{{ day_info.slots|length }} classes</span>
+        </div>
+        <div class="card-body p-0">
+          {% if day_info.slots %}
+            <div class="list-group list-group-flush">
+              {% for slot in day_info.slots %}
+                <div class="list-group-item p-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle fw-semibold">
+                      {{ slot.start_time|time:"H:i" }} - {{ slot.end_time|time:"H:i" }}
+                    </span>
+                    {% if is_admin %}
+                      <form action="{% url 'academics:routine_delete' slot.pk %}" method="post" class="d-inline" onsubmit="return confirm('Remove slot?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link text-danger p-0 border-0"><i class="bi bi-trash"></i></button>
+                      </form>
+                    {% endif %}
+                  </div>
+                  <h6 class="fw-bold mb-1 text-dark">{{ slot.course.name }}</h6>
+                  <div class="small text-muted mb-1">
+                    <i class="bi bi-people me-1"></i>{{ slot.section }} &bull;
+                    <i class="bi bi-geo-alt me-1"></i>{{ slot.room|default:"TBD" }}
+                  </div>
+                  <small class="text-secondary"><i class="bi bi-person me-1"></i>Instructor: {{ slot.teacher.get_full_name|default:slot.teacher.username }}</small>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center text-muted py-4 small">No classes scheduled</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

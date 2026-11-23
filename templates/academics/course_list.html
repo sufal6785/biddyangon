@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Courses - Biddyangon{% endblock %}
+
+{% block content %}
+<div class="row align-items-center mb-4">
+  <div class="col">
+    <h2 class="fw-bold mb-1"><i class="bi bi-journal-bookmark text-primary me-2"></i>Course Catalog</h2>
+    <p class="text-muted mb-0">Manage coaching courses, subject fees, and planned lectures.</p>
+  </div>
+  <div class="col-auto">
+    <a href="{% url 'academics:course_create' %}" class="btn btn-primary">
+      <i class="bi bi-plus-lg me-1"></i>New Course
+    </a>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3 bg-white mb-4">
+  <div class="card-header bg-white border-0 pt-3 pb-2">
+    <form method="get" class="row g-2">
+      <div class="col-md-4">
+        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Search by course name or code...">
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search me-1"></i>Search</button>
+      </div>
+    </form>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Course</th>
+            <th>Class</th>
+            <th>Default Fee</th>
+            <th>Planned Sessions</th>
+            <th>Assigned Teachers</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for course in courses %}
+            <tr>
+              <td>
+                <div class="fw-bold text-dark">{{ course.name }}</div>
+                <small class="text-muted"><code>{{ course.code }}</code></small>
+              </td>
+              <td>{{ course.academic_class.name }}</td>
+              <td class="fw-bold text-success">৳ {{ course.default_fee|floatformat:2 }}</td>
+              <td>{{ course.total_sessions_planned }}</td>
+              <td>
+                {% for a in course.teacher_assignments.all %}
+                  <span class="badge bg-light text-dark border me-1">{{ a.teacher.username }}</span>
+                {% empty %}
+                  <span class="text-muted small">Unassigned</span>
+                {% endfor %}
+              </td>
+              <td>
+                {% if course.is_active %}
+                  <span class="badge bg-success">Active</span>
+                {% else %}
+                  <span class="badge bg-secondary">Inactive</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <a href="{% url 'academics:course_edit' course.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="7" class="text-center text-muted py-4">No courses found matching your criteria.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
