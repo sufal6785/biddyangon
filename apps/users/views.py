@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.contrib.auth.decorators import login_required
@@ -12,9 +13,16 @@ from .serializers import UserSerializer
 
 
 def index(request):
-    if request.user.is_authenticated:
-        return redirect("dashboard:index")
-    return render(request, "users/home.html")
+    return JsonResponse({
+        "status": "online",
+        "service": "Biddyangon Coaching Management Backend API",
+        "version": "1.0.0",
+        "endpoints": {
+            "api_root": "/api/",
+            "auth_login": "/api/auth/login/",
+            "admin": "/admin/"
+        }
+    })
 
 
 def login_view(request):
