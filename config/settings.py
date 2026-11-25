@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import sys
+import dj_database_url
 
 # Base Directory Setup
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,7 +16,7 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,*").split(",")
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,.onrender.com,*").split(",")
 
 
 # Installed Applications
@@ -81,27 +82,36 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # Database Configuration:
 # Defaults to SQLite for local development and test stability without requiring an external service.
-# Set DB_ENGINE=django.db.backends.postgresql to use PostgreSQL.
-DB_ENGINE = os.environ.get("DB_ENGINE", "django.db.backends.sqlite3")
-
-if "sqlite3" in DB_ENGINE or os.environ.get("USE_SQLITE", "True").lower() == "true":
+# Uses DATABASE_URL (e.g. on Render PostgreSQL) automatically when configured.
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if DATABASE_URL:
     DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
 else:
-    DATABASES = {
-        "default": {
-            "ENGINE": DB_ENGINE,
-            "NAME": os.environ.get("DB_NAME", "biddyangon_db"),
-            "USER": os.environ.get("DB_USER", "postgres"),
-            "PASSWORD": os.environ.get("DB_PASSWORD", "sufal6785"),
-            "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
-            "PORT": os.environ.get("DB_PORT", "5432"),
+    DB_ENGINE = os.environ.get("DB_ENGINE", "django.db.backends.sqlite3")
+    if "sqlite3" in DB_ENGINE or os.environ.get("USE_SQLITE", "True").lower() == "true":
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "db.sqlite3",
+            }
         }
-    }
+    else:
+        DATABASES = {
+            "default": {
+                "ENGINE": DB_ENGINE,
+                "NAME": os.environ.get("DB_NAME", "biddyangon_db"),
+                "USER": os.environ.get("DB_USER", "postgres"),
+                "PASSWORD": os.environ.get("DB_PASSWORD", "sufal6785"),
+                "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
+                "PORT": os.environ.get("DB_PORT", "5432"),
+            }
+        }
 
 
 # Custom User Model
@@ -180,4 +190,5 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "https://*.vercel.app",
+    "https://*.onrender.com",
 ]

@@ -1,0 +1,30 @@
+databases:
+  - name: biddyangon-db
+    databaseName: biddyangon
+    user: biddyangon_user
+    plan: free
+
+services:
+  - type: web
+    name: biddyangon-backend
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.1
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: biddyangon-db
+          property: connectionString
+      - key: CORS_ALLOW_ALL
+        value: "True"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "localhost,127.0.0.1,.onrender.com,*"
